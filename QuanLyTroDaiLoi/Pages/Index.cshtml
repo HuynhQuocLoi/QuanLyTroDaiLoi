@@ -1,0 +1,54 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Trang chính";
+}
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+
+<div class="text-center mb-5">
+    <h1 class="fw-bold">Quản lý trọ</h1>
+    <h2 class="fw-bold">Đại Lợi</h2>
+</div>
+
+<div class="row g-4">
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm h-100 border-0 hover-scale text-center">
+            <div class="card-body">
+                <i class="bi bi-house-door-fill display-3 text-primary"></i>
+                <h5 class="fw-bold">Phòng trọ</h5>
+                <a class="btn btn-primary w-100" asp-page="/DonVis/Index" asp-route-loai="Phong">Mở</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm h-100 border-0 hover-scale text-center">
+            <div class="card-body">
+                <i class="bi bi-building display-3 text-success"></i>
+                <h5 class="fw-bold">Nhà trọ</h5>
+                <a class="btn btn-success w-100" asp-page="/DonVis/Index" asp-route-loai="Nha">Mở</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm h-100 border-0 hover-scale text-center">
+            <div class="card-body">
+                <i class="bi bi-lightning-fill display-3 text-info"></i>
+                <h5 class="fw-bold">Điện nước</h5>
+                <a class="btn btn-info w-100" asp-page="/CauHinhs/Edit">Mở</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3">
+        <div class="card shadow-sm h-100 border-0 hover-scale text-center">
+            <div class="card-body">
+                <i class="bi bi-currency-dollar display-3 text-warning"></i>
+                <h5 class="fw-bold">Giá thuê</h5>
+                <a class="btn btn-warning w-100" asp-page="/CauHinhThues/Edit">Mở</a>
+            </div>
+        </div>
+    </div>
+</div>

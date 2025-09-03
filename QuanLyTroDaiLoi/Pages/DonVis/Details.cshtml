@@ -1,0 +1,227 @@
+﻿@page "{id:int}"
+@model QuanLyTroDaiLoi.Pages.DonVis.DetailsModel
+@{
+    ViewData["Title"] = "Chi tiết phòng";
+}
+
+<div class="container py-3">
+    <h2 class="text-center text-primary fw-bold mb-4">@Model.DonVi.TenDonVi</h2>
+
+    <!-- Chọn tháng/năm -->
+    <form method="get" class="row g-2 mb-3 align-items-end">
+        <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
+        <div class="col-6 col-sm-4 col-md-2">
+            <label>Tháng</label>
+            <select asp-for="Thang" asp-items="Model.ThangList" class="form-control"></select>
+        </div>
+        <div class="col-6 col-sm-4 col-md-2">
+            <label>Năm</label>
+            <select asp-for="Nam" asp-items="Model.NamList" class="form-control"></select>
+        </div>
+        <div class="col-12 col-sm-4 col-md-2">
+            <button type="submit" class="btn btn-primary w-100 mt-2 mt-sm-0">Xem</button>
+        </div>
+    </form>
+
+    @if (Model.Thang > 0 && Model.Nam > 0)
+    {
+        if (Model.CurrentMonth == null)
+        {
+            <div class="alert alert-warning">
+                Chưa có dữ liệu cho <strong>@Model.Thang/@Model.Nam</strong>.
+            </div>
+            <form method="post" asp-page-handler="InitMonth" class="mb-3">
+                <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
+                <input type="hidden" name="Thang" value="@Model.Thang" />
+                <input type="hidden" name="Nam" value="@Model.Nam" />
+                <button type="submit" class="btn btn-success w-100 w-md-auto">Tạo kỳ mới</button>
+            </form>
+        }
+        else
+        {
+            <h4 class="mt-3">Kỳ: @Model.Thang/@Model.Nam</h4>
+
+            <!-- Người thuê -->
+            <div class="table-responsive mb-3">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Họ tên</th>
+                            <th>CCCD</th>
+                            <th>SĐT</th>
+                            <th>Địa chỉ</th>
+                            <th>Ngày vào</th>
+                            <th>Hành động</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var nt in Model.DonVi.NguoiThues)
+                        {
+                            <tr>
+                                <td>@nt.HoTen</td>
+                                <td>@nt.CCCD</td>
+                                <td>@nt.SDT</td>
+                                <td>@nt.DiaChi</td>
+                                <td>@nt.NgayVao.ToString("dd/MM/yyyy")</td>
+                                <td>
+                                    <form method="post" asp-page-handler="RemoveNguoiThue">
+                                        <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
+                                        <input type="hidden" name="nguoiId" value="@nt.NguoiThueId" />
+                                        <input type="hidden" name="Thang" value="@Model.Thang" />
+                                        <input type="hidden" name="Nam" value="@Model.Nam" />
+                                        <button type="submit" class="btn btn-sm btn-danger w-100">Xóa</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Thêm người thuê -->
+            <form method="post" asp-page-handler="AddNguoiThue" class="row g-2 mb-3">
+                <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
+                <input type="hidden" name="Thang" value="@Model.Thang" />
+                <input type="hidden" name="Nam" value="@Model.Nam" />
+
+                <div class="col-12 col-md-3"><input class="form-control" name="HoTen" placeholder="Họ tên" required /></div>
+                <div class="col-12 col-md-2"><input class="form-control" name="CCCD" placeholder="CCCD" required /></div>
+                <div class="col-12 col-md-2"><input class="form-control" name="SDT" placeholder="SĐT" required /></div>
+                <div class="col-12 col-md-3"><input class="form-control" name="DiaChi" placeholder="Địa chỉ" /></div>
+                <div class="col-12 col-md-2"><input type="date" class="form-control" name="NgayVao" /></div>
+
+                <div class="col-12 mt-2">
+                    <button type="submit" class="btn btn-success w-100 w-md-auto">Thêm người thuê</button>
+                </div>
+            </form>
+
+            <!-- Hóa đơn điện nước -->
+            <form method="post" asp-page-handler="SaveWaterElectric" class="row g-2 mb-3">
+                <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
+                <input type="hidden" name="Thang" value="@Model.Thang" />
+                <input type="hidden" name="Nam" value="@Model.Nam" />
+
+                <div class="col-6 col-md-3">
+                    <label>Điện cũ</label>
+                    <input type="number" class="form-control" name="DienCu" value="@Model.CurrentMonth.DienCu" required />
+                </div>
+                <div class="col-6 col-md-3">
+                    <label>Điện mới</label>
+                    <input type="number" class="form-control" name="DienMoi" value="@Model.CurrentMonth.DienMoi" required />
+                </div>
+                <div class="col-6 col-md-3">
+                    <label>Nước cũ</label>
+                    <input type="number" class="form-control" name="NuocCu" value="@Model.CurrentMonth.NuocCu" required />
+                </div>
+                <div class="col-6 col-md-3">
+                    <label>Nước mới</label>
+                    <input type="number" class="form-control" name="NuocMoi" value="@Model.CurrentMonth.NuocMoi" required />
+                </div>
+
+                <div class="col-12 mt-2">
+                    <button type="submit" class="btn btn-info w-100 w-md-auto">Lưu điện nước</button>
+                </div>
+            </form>
+
+            <!-- Tổng tiền -->
+            <div class="card mb-3">
+                <div class="card-header">Tổng tiền</div>
+                <div class="card-body">
+                    @using System.Globalization
+            @{
+                        var tienPhong = Model.CurrentMonth.TienPhong;
+                        var tienDien = (Model.CurrentMonth.DienMoi - Model.CurrentMonth.DienCu) * Model.CurrentMonth.DonGiaDien;
+                        var tienNuoc = (Model.CurrentMonth.NuocMoi - Model.CurrentMonth.NuocCu) * Model.CurrentMonth.DonGiaNuoc;
+                        var tienPhuPhi = Model.CurrentMonth.PhiKhacs?.Sum(p => p.ThanhTien) ?? 0;
+                        var tongTien = tienPhong + tienDien + tienNuoc + tienPhuPhi;
+                        var vnFormat = CultureInfo.GetCultureInfo("vi-VN");
+                    }
+                    <p>Tiền phòng: <strong>@tienPhong.ToString("C0", vnFormat)</strong></p>
+                    <p>Tiền điện: <strong>@tienDien.ToString("C0", vnFormat)</strong></p>
+                    <p>Tiền nước: <strong>@tienNuoc.ToString("C0", vnFormat)</strong></p>
+                    <p>Phụ phí khác: <strong>@tienPhuPhi.ToString("C0", vnFormat)</strong></p>
+                    <hr />
+                    <p><strong>Tổng tiền: @tongTien.ToString("C0", vnFormat)</strong></p>
+                </div>
+            </div>
+
+            <!-- Phí khác -->
+            <div class="table-responsive mb-3">
+                <table class="table table-bordered">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Tên phí</th>
+                            <th>Đơn giá</th>
+                            <th>Số lượng</th>
+                            <th>Thành tiền</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var phi in Model.CurrentMonth.PhiKhacs)
+                        {
+                            <tr>
+                                <td>@phi.TenPhi</td>
+                                <td>@phi.DonGia.ToString("C0", CultureInfo.GetCultureInfo("vi-VN"))</td>
+                                <td>@phi.SoLuong</td>
+                                <td>@phi.ThanhTien.ToString("C0", CultureInfo.GetCultureInfo("vi-VN"))</td>
+                                <td>
+                                    <form method="post" asp-page-handler="DeletePhiKhac">
+                                        <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
+                                        <input type="hidden" name="phiId" value="@phi.PhiKhacId" />
+                                        <input type="hidden" name="Thang" value="@Model.Thang" />
+                                        <input type="hidden" name="Nam" value="@Model.Nam" />
+                                        <button type="submit" class="btn btn-sm btn-danger w-100">Xóa</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Thêm phí khác -->
+            <form method="post" asp-page-handler="AddPhiKhac" class="row g-2 mb-3">
+                <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
+                <input type="hidden" name="Thang" value="@Model.Thang" />
+                <input type="hidden" name="Nam" value="@Model.Nam" />
+
+                <div class="col-12 col-md-4"><input class="form-control" name="TenPhi" placeholder="Tên phí" required /></div>
+                <div class="col-12 col-md-3">
+                    <input type="text" class="form-control" name="DonGiaInput" placeholder="Đơn giá" required oninput="formatCurrency(this)" />
+                </div>
+                <div class="col-12 col-md-2"><input type="number" class="form-control" name="SoLuong" placeholder="SL" required /></div>
+                <div class="col-12 col-md-3">
+                    <button type="submit" class="btn btn-success w-100 w-md-auto">Thêm phí khác</button>
+                </div>
+            </form>
+
+            <!-- Quản lý dữ liệu -->
+            <div class="card mb-3">
+                <div class="card-header">Quản lý dữ liệu</div>
+                <div class="card-body d-flex flex-column flex-md-row gap-2">
+                    <form method="post" asp-page-handler="ResetRoomData" class="w-100 w-md-auto">
+                        <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
+                        <button type="submit" class="btn btn-warning w-100" onclick="return confirm('Xóa tất cả người thuê và phí nhưng giữ số điện nước?')">
+                            Xóa dữ liệu nhưng giữ số điện nước
+                        </button>
+                    </form>
+
+                    <form method="post" asp-page-handler="DeleteAllData" class="w-100 w-md-auto">
+                        <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
+                        <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Xóa toàn bộ dữ liệu phòng?')">
+                            Xóa toàn bộ dữ liệu
+                        </button>
+                    </form>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+<script>
+    function formatCurrency(input) {
+        let value = input.value.replace(/\D/g, '');
+        input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+    }
+</script>

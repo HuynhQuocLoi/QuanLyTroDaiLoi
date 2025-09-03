@@ -1,0 +1,75 @@
+﻿@page "{loai?}"
+@model QuanLyTroDaiLoi.Pages.DonVis.IndexModel
+
+<div class="container py-4">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-primary">@Model.LoaiDonVi</h2>
+    </div>
+
+    <!-- Table view cho desktop/tablet -->
+    <div class="table-responsive d-none d-md-block">
+        <table class="table align-middle table-hover rounded shadow-sm">
+            <thead class="table-primary">
+                <tr>
+                    <th>Tên @Model.LoaiDonVi.ToLower()</th>
+                    <th class="text-end">Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.DanhSachDonVi)
+                {
+                    <tr class="align-middle">
+                        <td class="fw-bold">@item.TenDonVi</td>
+                        <td class="text-end">
+                            <a asp-page="Details" asp-route-id="@item.DonViId" class="btn btn-sm btn-info">
+                                <i class="bi bi-eye"></i> Xem
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Card view cho mobile -->
+    <div class="d-md-none row g-3">
+        @foreach (var item in Model.DanhSachDonVi)
+        {
+            <div class="col-12">
+                <div class="card shadow-sm h-100">
+                    <div class="card-body d-flex justify-content-between align-items-center">
+                        <span class="fw-bold">@item.TenDonVi</span>
+                        <a asp-page="Details" asp-route-id="@item.DonViId" class="btn btn-sm btn-info">
+                            <i class="bi bi-eye"></i> Xem
+                        </a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    /* Hover hiệu ứng cho table */
+    .table-hover tbody tr:hover {
+        background-color: rgba(30, 60, 114, 0.1);
+        transition: background-color 0.2s;
+    }
+
+    table {
+        border-radius: 0.75rem;
+        overflow: hidden;
+    }
+
+    /* Card mobile */
+    .card {
+        border-radius: 0.75rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+        cursor: pointer;
+    }
+
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+</style>

@@ -1,0 +1,45 @@
+﻿@page
+@model QuanLyTroDaiLoi.Pages.CauHinhsThue.EditModel
+@{
+    ViewData["Title"] = "Cập nhật giá thuê";
+}
+
+<div class="container py-4">
+    <div class="text-center mb-4">
+        <h2 class="fw-bold text-primary">Cập nhật giá thuê</h2>
+    </div>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">@TempData["Message"]</div>
+    }
+
+    <form method="post">
+        <div class="row g-3">
+            <div class="col-12 col-md-6">
+                <label asp-for="CauHinh.GiaThuePhong" class="form-label"></label>
+                <input asp-for="CauHinh.GiaThuePhong" class="form-control w-100" />
+                <span asp-validation-for="CauHinh.GiaThuePhong" class="text-danger"></span>
+            </div>
+            <div class="col-12 col-md-6">
+                <label asp-for="CauHinh.GiaThueNha" class="form-label"></label>
+                <input asp-for="CauHinh.GiaThueNha" class="form-control w-100" />
+                <span asp-validation-for="CauHinh.GiaThueNha" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row mt-3 g-2">
+            <div class="col-12 col-md-6">
+                <button type="submit" class="btn btn-primary w-100">Lưu</button>
+            </div>
+            <div class="col-12 col-md-6">
+                <a asp-page="/Index" class="btn btn-secondary w-100">Hủy</a>
+            </div>
+        </div>
+    </form>
+
+    @section Scripts {
+        <partial name="_ValidationScriptsPartial" />
+    }
+
+</div>

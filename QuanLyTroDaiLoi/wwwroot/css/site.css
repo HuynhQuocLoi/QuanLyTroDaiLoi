@@ -1,0 +1,143 @@
+﻿html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+/* site.css */
+
+/* Responsive heading */
+@media (max-width: 576px) {
+    h2.fw-bold {
+        font-size: 1.8rem;
+    }
+}
+
+/* Inputs full width */
+input.form-control {
+    width: 100% !important;
+}
+
+/* Khoảng cách cho các cột */
+.row.g-2 .col-12 {
+    margin-bottom: 0.5rem;
+}
+
+/* Card hover */
+.hover-scale {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+    .hover-scale:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+/* Table hover effect */
+.table-hover tbody tr:hover {
+    background-color: rgba(30, 60, 114, 0.1);
+    transition: background-color 0.2s;
+}
+
+table {
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+/* site.css */
+
+/* Heading chính trên dashboard */
+h1.fw-bold {
+    font-size: 3rem;
+    color: #1e3c72;
+    letter-spacing: 1px;
+}
+
+h2.fw-bold {
+    font-size: 2.5rem;
+    letter-spacing: 1px;
+    color: #0d6efd; /* text-primary */
+}
+
+/* Responsive heading */
+@media (max-width: 768px) {
+    h1.fw-bold {
+        font-size: 2.2rem;
+    }
+
+    h2.fw-bold {
+        font-size: 2rem;
+    }
+}
+
+@media (max-width: 576px) {
+    h1.fw-bold {
+        font-size: 1.8rem;
+    }
+
+    h2.fw-bold {
+        font-size: 1.5rem;
+    }
+}
+
+/* Card hover effect */
+.hover-scale {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    cursor: pointer;
+}
+
+    .hover-scale:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+    }
+
+/* Dashboard card layout */
+.card-body i.display-3 {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Buttons full width on mobile */
+@media (max-width: 576px) {
+    .card-body .btn {
+        width: 100% !important;
+    }
+}
+
+/* Table hover effect (dùng chung cho các table trong app) */
+.table-hover tbody tr:hover {
+    background-color: rgba(30, 60, 114, 0.1);
+    transition: background-color 0.2s;
+}
+
+table {
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+/* Form input full width */
+input.form-control {
+    width: 100% !important;
+}
+
+/* Khoảng cách giữa các cột form */
+.row.g-2 .col-12, .row.g-3 .col-12 {
+    margin-bottom: 0.5rem;
+}
+
