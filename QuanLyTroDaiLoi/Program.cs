@@ -1,10 +1,14 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QuanLyTroDaiLoi.Data;
 using QuanLyTroDaiLoi.Models;
+using QuestPDF.Infrastructure; // 👈 Thêm using này
 
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Cấu hình License cho QuestPDF
+QuestPDF.Settings.License = LicenseType.Community;
 
 // Razor Pages
 builder.Services.AddRazorPages();

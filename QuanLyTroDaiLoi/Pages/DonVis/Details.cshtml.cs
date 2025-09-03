@@ -2,12 +2,16 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using PuppeteerSharp;
+using QuestPDF.Fluent;
+using QuestPDF.Helpers;
+using QuestPDF.Infrastructure;
 using QuanLyTroDaiLoi.Data;
 using QuanLyTroDaiLoi.Models;
+using QuestPDF.Helpers;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using SkiaSharp;
 
 namespace QuanLyTroDaiLoi.Pages.DonVis
 {
@@ -398,72 +402,106 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
 
             var tienDien = (hd.DienMoi - hd.DienCu) * hd.DonGiaDien;
             var tienNuoc = (hd.NuocMoi - hd.NuocCu) * hd.DonGiaNuoc;
-            var tongTien = hd.TienPhong + tienDien + tienNuoc + (hd.PhiKhacs?.Sum(p => p.ThanhTien) ?? 0);
+            var tienPhiKhac = hd.PhiKhacs?.Sum(p => p.ThanhTien) ?? 0;
+            var tongTien = hd.TienPhong + tienDien + tienNuoc + tienPhiKhac;
 
             var soTaiKhoan = "0909678666"; // cố định
 
-            var htmlContent = $@"
-<html>
-<head>
-    <meta charset='UTF-8'>
-    <style>
-        body {{ font-family: Arial; padding: 20px; }}
-        h2 {{ color: #0d6efd; }}
-        table {{ width: 100%; border-collapse: collapse; margin-top: 10px; }}
-        th, td {{ border: 1px solid #ccc; padding: 8px; text-align: left; }}
-        th {{ background-color: #f0f0f0; }}
-        .right {{ text-align: right; }}
-        .header, .footer {{ margin-top: 20px; }}
-    </style>
-</head>
-<body>
-    <div class='header'>
-        <h2>HÓA ĐƠN THANH TOÁN PHÒNG TRỌ</h2>
-        <p> {hd.DonVi.TenDonVi} - Kỳ: {Thang}/{Nam}</p>
-    </div>
+            QuestPDF.Settings.License = LicenseType.Community;
 
-    <table>
-        <tr><th>Hạng mục</th><th class='right'>Số tiền (VND)</th></tr>
-        <tr><td>Tiền phòng</td><td class='right'>{hd.TienPhong:N0}</td></tr>
-        <tr><td>Tiền điện</td><td class='right'>{tienDien:N0}</td></tr>
-        <tr><td>Tiền nước</td><td class='right'>{tienNuoc:N0}</td></tr>";
-
-            if (hd.PhiKhacs != null && hd.PhiKhacs.Any())
+            var document = Document.Create(container =>
             {
-                foreach (var phi in hd.PhiKhacs)
+                container.Page(page =>
                 {
-                    htmlContent += $"<tr><td>{phi.TenPhi}</td><td class='right'>{phi.ThanhTien:N0}</td></tr>";
-                }
-            }
+                    page.Size(PageSizes.A5);
+                    page.Margin(20);
 
-            htmlContent += $@"
-        <tr><th>Tổng tiền</th><th class='right'>{tongTien:N0}</th></tr>
-    </table>
+                    page.Header().Text("HÓA ĐƠN THANH TOÁN THUÊ TRỌ")
+                        .SemiBold().FontSize(18).FontColor(Colors.Blue.Medium).AlignCenter();
 
-    <div class='footer'>
-        <p>Người nhận: Huỳnh Công Lý</p>
-        <p>STK: {soTaiKhoan}</p>
-        <p>Ngân hàng: Sacombank</p>
-    </div>
-</body>
-</html>";
+                    page.Content().Column(col =>
+                    {
+                        col.Spacing(10);
 
-            // PuppeteerSharp
-            var browserFetcher = new BrowserFetcher();
-            await browserFetcher.DownloadAsync(); // tải Chromium mặc định
-            using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
-            {
-                Headless = true,
-                Args = new[] { "--no-sandbox", "--disable-setuid-sandbox" }
+                        col.Item().Text($"{hd.DonVi.TenDonVi} - Tháng {Thang}/{Nam}")
+                            .FontSize(12).AlignCenter();
+
+                        // Bảng chi tiết
+                        col.Item().Table(table =>
+                        {
+                            table.ColumnsDefinition(c =>
+                            {
+                                c.RelativeColumn(3);  // Hạng mục
+                                c.RelativeColumn(3);  // Chỉ số
+                                c.RelativeColumn(3);  // Đơn giá
+                                c.RelativeColumn(6);  // Thành tiền (rộng nhất)
+                            });
+
+                            // Header
+                            table.Header(h =>
+                            {
+                                h.Cell().Border(1).Padding(4).Background(Colors.Grey.Lighten2).Text("Hạng mục").SemiBold();
+                                h.Cell().Border(1).Padding(4).Background(Colors.Grey.Lighten2).AlignCenter().Text("Chỉ số").SemiBold();
+                                h.Cell().Border(1).Padding(4).Background(Colors.Grey.Lighten2).AlignCenter().Text("Đơn giá").SemiBold();
+                                h.Cell().Border(1).Padding(4)
+    .Background(Colors.Grey.Lighten2)
+    .AlignCenter()   // thay vì AlignRight
+    .Text("Thành tiền").SemiBold();
+
+                            });
+
+                            // Hàm tiện ích để thêm row
+                            void Row(string hangMuc, string chiSo, string donGia, string thanhTien)
+                            {
+                                table.Cell().Border(1).Padding(4).Text(hangMuc);
+                                table.Cell().Border(1).Padding(4).AlignCenter().Text(chiSo);
+                                table.Cell().Border(1).Padding(4).AlignCenter().Text(donGia);
+                                table.Cell().Border(1).Padding(4).AlignRight()
+                                    .Element(x => x.Shrink()) // ép số nằm gọn
+                                    .Text(thanhTien);
+                            }
+
+
+                            Row("Tiền phòng", "-", "-", $"{hd.TienPhong:N0}");
+                            Row("Điện", $"{hd.DienCu} → {hd.DienMoi}", $"{hd.DonGiaDien:N0}", $"{tienDien:N0}");
+                            Row("Nước", $"{hd.NuocCu} → {hd.NuocMoi}", $"{hd.DonGiaNuoc:N0}", $"{tienNuoc:N0}");
+
+                            if (hd.PhiKhacs != null)
+                            {
+                                foreach (var phi in hd.PhiKhacs)
+                                {
+                                    Row(phi.TenPhi, "-", $"{phi.DonGia:N0}", $"{phi.ThanhTien:N0}");
+                                }
+                            }
+                        });
+
+
+                        // Tổng cộng
+                        col.Item()
+                            .PaddingTop(10)
+                            .AlignRight()
+                            .Text($"TỔNG CỘNG: {tongTien:N0} ₫")
+                            .Bold().FontSize(14).FontColor(Colors.Red.Medium);
+
+                        // Footer
+                        col.Item().PaddingTop(15).Column(c =>
+                        {
+                            c.Item().Text("Người nhận: Huỳnh Công Lý").AlignCenter();
+                            c.Item().Text($"STK: {soTaiKhoan} (Sacombank)").AlignCenter();
+                            c.Item().Text("Xin cảm ơn quý khách!").Italic().FontSize(11).AlignCenter();
+                        });
+                    });
+                });
             });
 
-            using var page = await browser.NewPageAsync();
-            await page.SetContentAsync(htmlContent);
+            // Xuất ra ảnh PNG
+            var images = document.GenerateImages();
+            var firstImageBytes = images.First();
+            var imgStream = new MemoryStream(firstImageBytes);
 
-            var stream = await page.ScreenshotStreamAsync(new ScreenshotOptions { FullPage = true });
-
-            return File(stream, "image/png", $"HoaDon_{hd.DonVi.TenDonVi}_{Thang}_{Nam}.png");
+            return File(imgStream, "image/png", $"HoaDon_{hd.DonVi.TenDonVi}_{Thang}_{Nam}.png");
         }
+
 
     }
 }
