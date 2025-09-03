@@ -216,10 +216,12 @@
                     <!-- Nút xóa dữ liệu -->
                     <form method="post" asp-page-handler="DeleteAllData" class="w-100 w-md-auto">
                         <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
-                        <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Xóa toàn bộ dữ liệu phòng?')">
+                        <button type="submit" class="btn btn-danger w-100"
+                                onclick="return confirm('Bạn có chắc muốn xóa toàn bộ dữ liệu của phòng này không?')">
                             <i class="bi bi-trash-fill"></i> Xóa dữ liệu
                         </button>
                     </form>
+
 
                     <!-- Nút tạo hóa đơn -->
                     <form method="post" asp-page-handler="ExportInvoice" class="w-100 w-md-auto">

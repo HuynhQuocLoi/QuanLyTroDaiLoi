@@ -64,13 +64,19 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
 
                 if (CurrentMonth != null)
                 {
-                    // Cập nhật tiền phòng theo loại đơn vị
-                    CurrentMonth.TienPhong = CurrentMonth.DonVi?.LoaiDonVi?.ToLower() == "nha"
-                        ? cauHinhThue.GiaThueNha
-                        : cauHinhThue.GiaThuePhong;
+                    // Chỉ khi hóa đơn chưa có tiền phòng thì mới set theo cấu hình
+                    if (CurrentMonth.TienPhong <= 0)
+                    {
+                        CurrentMonth.TienPhong = CurrentMonth.DonVi?.LoaiDonVi?.ToLower() == "nha"
+                            ? cauHinhThue.GiaThueNha
+                            : cauHinhThue.GiaThuePhong;
+
+                        await _context.SaveChangesAsync(); // lưu snapshot giá thuê
+                    }
 
                     UpdateTongTien(CurrentMonth); // cập nhật tổng tiền
                 }
+
 
             }
             UpdateTongTien(CurrentMonth);
@@ -79,11 +85,12 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
         }
 
         // ------------------------ INIT MONTH ------------------------
+        // ------------------------ INIT MONTH ------------------------
         public async Task<IActionResult> OnPostInitMonthAsync(int id)
         {
             if (Thang <= 0 || Nam <= 0) return RedirectToPage(new { id });
 
-            // Lấy cấu hình giá điện, nước
+            // Lấy cấu hình giá điện, nước (mới nhất)
             var cauHinh = await _context.CauHinhs.FirstOrDefaultAsync()
                            ?? new CauHinh { DonGiaDien = 3500, DonGiaNuoc = 10000 };
 
@@ -98,17 +105,18 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
                 var prev = await GetPrevBillAsync(id, Thang, Nam);
                 var (dCu, nCu) = prev == null ? (0, 0) : (prev.DienMoi, prev.NuocMoi);
 
-                // Lấy thông tin đơn vị (để lấy loại đơn vị nếu cần)
+                // Lấy thông tin đơn vị
                 var donVi = await _context.DonVis.FirstOrDefaultAsync(d => d.DonViId == id);
                 if (donVi == null) return NotFound();
 
-                // Chọn giá thuê theo loại đơn vị (ví dụ "Nha" hay "Phong")
-                decimal tienPhong = cauHinhThue.GiaThuePhong; // mặc định phòng
+                // Chọn giá thuê theo loại đơn vị
+                decimal tienPhong = cauHinhThue.GiaThuePhong;
                 if (!string.IsNullOrEmpty(donVi.LoaiDonVi) && donVi.LoaiDonVi.ToLower() == "nha")
                 {
                     tienPhong = cauHinhThue.GiaThueNha;
                 }
 
+                // 🔥 Khi tạo kỳ mới -> lấy đơn giá điện nước từ cấu hình hiện tại
                 var bill = new HoaDon
                 {
                     DonViId = id,
@@ -150,6 +158,7 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
 
             return RedirectToPage(new { id, Thang, Nam });
         }
+
 
 
 
@@ -300,31 +309,29 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
         // ------------------------ DELETE ALL DATA ------------------------
         public async Task<IActionResult> OnPostDeleteAllDataAsync(int id)
         {
-            var donVi = await _context.DonVis
-                .Include(d => d.NguoiThues)
-                .Include(d => d.DonViThangs)
-                    .ThenInclude(m => m.PhiKhacs)
-                .FirstOrDefaultAsync(d => d.DonViId == id);
+            // 🔹 Xóa toàn bộ người thuê của phòng
+            var nguoiThues = await _context.NguoiThues.Where(n => n.DonViId == id).ToListAsync();
+            _context.NguoiThues.RemoveRange(nguoiThues);
 
-            if (donVi != null)
-            {
-                // Xóa tất cả người thuê
-                _context.NguoiThues.RemoveRange(donVi.NguoiThues);
+            // 🔹 Xóa toàn bộ phụ phí liên quan phòng này
+            var phiKhacs = await _context.PhiKhacs.Where(p => p.DonViId == id).ToListAsync();
+            _context.PhiKhacs.RemoveRange(phiKhacs);
 
-                // Xóa tất cả phụ phí trong từng kỳ
-                foreach (var month in donVi.DonViThangs)
-                {
-                    _context.PhiKhacs.RemoveRange(month.PhiKhacs);
-                }
+            // 🔹 Xóa toàn bộ kỳ của phòng (bao gồm cả số điện, nước cũ/mới)
+            var thangs = await _context.DonViThangs.Where(t => t.DonViId == id).ToListAsync();
+            _context.DonViThangs.RemoveRange(thangs);
 
-                // Xóa tất cả kỳ (DonViThang)
-                _context.DonViThangs.RemoveRange(donVi.DonViThangs);
+            // 🔹 Xóa luôn hóa đơn của phòng nếu có
+            var hoaDons = await _context.HoaDons.Where(h => h.DonViId == id).ToListAsync();
+            _context.HoaDons.RemoveRange(hoaDons);
 
-                await _context.SaveChangesAsync();
-            }
+            // Lưu thay đổi
+            await _context.SaveChangesAsync();
 
-            return RedirectToPage("/DonVis/Index"); // quay về danh sách phòng
+            return RedirectToPage("/DonVis/Index"); // Quay về danh sách phòng
         }
+
+
 
 
 
@@ -339,43 +346,29 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
                 .Include(h => h.DonVi)
                 .FirstOrDefaultAsync(h => h.DonViId == donViId && h.Thang == pt && h.Nam == pn);
         }
-    
-    //-----------------------------XoaALL------------------------
-    public async Task<IActionResult> OnPostResetRoomDataAsync(int id)
+
+        //-----------------------------XoaALL------------------------
+        public async Task<IActionResult> OnPostResetRoomDataAsync(int id)
         {
-            var bill = await _context.HoaDons
-                .Where(h => h.DonViId == id)
-                .OrderByDescending(h => h.Nam)
-                .ThenByDescending(h => h.Thang)
-                .FirstOrDefaultAsync();
-
-            int dienMoi = bill?.DienMoi ?? 0;
-            int nuocMoi = bill?.NuocMoi ?? 0;
-
-            // Xóa người thuê
+            // Xóa tất cả người thuê
             var nguoi = await _context.NguoiThues.Where(n => n.DonViId == id).ToListAsync();
             _context.NguoiThues.RemoveRange(nguoi);
 
-            // Xóa các phí khác
+            // Xóa tất cả phụ phí
             var phis = await _context.PhiKhacs.Where(p => p.DonViId == id).ToListAsync();
             _context.PhiKhacs.RemoveRange(phis);
 
+            // Xóa tất cả hóa đơn của phòng
+            var bills = await _context.HoaDons.Where(h => h.DonViId == id).ToListAsync();
+            _context.HoaDons.RemoveRange(bills);
+
             await _context.SaveChangesAsync();
 
-            // Cập nhật lại số điện nước mới nhất thành cũ của kỳ tiếp theo
-            if (bill != null)
-            {
-                bill.DienCu = dienMoi;
-                bill.NuocCu = nuocMoi;
-                bill.DienMoi = dienMoi;
-                bill.NuocMoi = nuocMoi;
-                UpdateTongTien(bill);
-                _context.Update(bill);
-                await _context.SaveChangesAsync();
-            }
-
-            return RedirectToPage(new { id });
+            // Quay về danh sách hoặc trang chi tiết
+            return RedirectToPage("/DonVis/Index");
         }
+
+
         //---------------------Luu dien nuoc---------------
         public async Task<IActionResult> OnPostSaveWaterElectricAsync(int id, int DienCu, int DienMoi, int NuocCu, int NuocMoi)
         {
@@ -458,7 +451,12 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
             // PuppeteerSharp
             var browserFetcher = new BrowserFetcher();
             await browserFetcher.DownloadAsync(); // tải Chromium mặc định
-            using var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
+            using var browser = await Puppeteer.LaunchAsync(new LaunchOptions
+            {
+                Headless = true,
+                Args = new[] { "--no-sandbox", "--disable-setuid-sandbox" }
+            });
+
             using var page = await browser.NewPageAsync();
             await page.SetContentAsync(htmlContent);
 
