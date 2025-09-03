@@ -56,7 +56,10 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();
+app.UseStaticFiles();  // quan trọng, để serve CSS/JS từ wwwroot
 app.UseRouting();
+app.UseAuthorization(); // nếu có authentication
+
 app.MapRazorPages();
 app.Run();
+
