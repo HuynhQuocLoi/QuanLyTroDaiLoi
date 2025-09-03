@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using PuppeteerSharp;
 using QuanLyTroDaiLoi.Data;
 using QuanLyTroDaiLoi.Models;
 using System;
@@ -393,7 +394,78 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
 
             return RedirectToPage(new { id, Thang, Nam });
         }
-        
+        public async Task<IActionResult> OnPostExportInvoiceAsync(int id, int Thang, int Nam)
+        {
+            var hd = await _context.HoaDons
+                .Include(h => h.DonVi)
+                .Include(h => h.PhiKhacs)
+                .FirstOrDefaultAsync(h => h.DonViId == id && h.Thang == Thang && h.Nam == Nam);
+
+            if (hd == null) return NotFound();
+
+            var tienDien = (hd.DienMoi - hd.DienCu) * hd.DonGiaDien;
+            var tienNuoc = (hd.NuocMoi - hd.NuocCu) * hd.DonGiaNuoc;
+            var tongTien = hd.TienPhong + tienDien + tienNuoc + (hd.PhiKhacs?.Sum(p => p.ThanhTien) ?? 0);
+
+            var soTaiKhoan = "0909678666"; // cố định
+
+            var htmlContent = $@"
+<html>
+<head>
+    <meta charset='UTF-8'>
+    <style>
+        body {{ font-family: Arial; padding: 20px; }}
+        h2 {{ color: #0d6efd; }}
+        table {{ width: 100%; border-collapse: collapse; margin-top: 10px; }}
+        th, td {{ border: 1px solid #ccc; padding: 8px; text-align: left; }}
+        th {{ background-color: #f0f0f0; }}
+        .right {{ text-align: right; }}
+        .header, .footer {{ margin-top: 20px; }}
+    </style>
+</head>
+<body>
+    <div class='header'>
+        <h2>HÓA ĐƠN THANH TOÁN PHÒNG TRỌ</h2>
+        <p> {hd.DonVi.TenDonVi} - Kỳ: {Thang}/{Nam}</p>
+    </div>
+
+    <table>
+        <tr><th>Hạng mục</th><th class='right'>Số tiền (VND)</th></tr>
+        <tr><td>Tiền phòng</td><td class='right'>{hd.TienPhong:N0}</td></tr>
+        <tr><td>Tiền điện</td><td class='right'>{tienDien:N0}</td></tr>
+        <tr><td>Tiền nước</td><td class='right'>{tienNuoc:N0}</td></tr>";
+
+            if (hd.PhiKhacs != null && hd.PhiKhacs.Any())
+            {
+                foreach (var phi in hd.PhiKhacs)
+                {
+                    htmlContent += $"<tr><td>{phi.TenPhi}</td><td class='right'>{phi.ThanhTien:N0}</td></tr>";
+                }
+            }
+
+            htmlContent += $@"
+        <tr><th>Tổng tiền</th><th class='right'>{tongTien:N0}</th></tr>
+    </table>
+
+    <div class='footer'>
+        <p>Người nhận: Huỳnh Công Lý</p>
+        <p>STK: {soTaiKhoan}</p>
+        <p>Ngân hàng: Sacombank</p>
+    </div>
+</body>
+</html>";
+
+            // PuppeteerSharp
+            var browserFetcher = new BrowserFetcher();
+            await browserFetcher.DownloadAsync(); // tải Chromium mặc định
+            using var browser = await Puppeteer.LaunchAsync(new LaunchOptions { Headless = true });
+            using var page = await browser.NewPageAsync();
+            await page.SetContentAsync(htmlContent);
+
+            var stream = await page.ScreenshotStreamAsync(new ScreenshotOptions { FullPage = true });
+
+            return File(stream, "image/png", $"HoaDon_{hd.DonVi.TenDonVi}_{Thang}_{Nam}.png");
+        }
 
     }
 }

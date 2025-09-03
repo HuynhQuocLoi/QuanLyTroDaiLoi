@@ -21,7 +21,7 @@ namespace QuanLyTroDaiLoi.Models
         [Required(ErrorMessage = "SĐT không được để trống")]
         [Phone(ErrorMessage = "Số điện thoại không hợp lệ")]
         public string SDT { get; set; } = string.Empty;
-
+        [Required(ErrorMessage = "Địa chỉ không được để trống")]
         public string DiaChi { get; set; } = string.Empty;
         [Required(ErrorMessage = "Ngày vào không được để trống")]
         [DataType(DataType.Date)]

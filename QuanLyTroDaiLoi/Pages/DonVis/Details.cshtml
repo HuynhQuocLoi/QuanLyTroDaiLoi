@@ -87,8 +87,8 @@
                 <div class="col-12 col-md-3"><input class="form-control" name="HoTen" placeholder="Họ tên" required /></div>
                 <div class="col-12 col-md-2"><input class="form-control" name="CCCD" placeholder="CCCD" required /></div>
                 <div class="col-12 col-md-2"><input class="form-control" name="SDT" placeholder="SĐT" required /></div>
-                <div class="col-12 col-md-3"><input class="form-control" name="DiaChi" placeholder="Địa chỉ" /></div>
-                <div class="col-12 col-md-2"><input type="date" class="form-control" name="NgayVao" /></div>
+                <div class="col-12 col-md-3"><input class="form-control" name="DiaChi" placeholder="Địa chỉ" required /></div>
+                <div class="col-12 col-md-2"><input type="date" class="form-control" name="NgayVao" required /></div>
 
                 <div class="col-12 mt-2">
                     <button type="submit" class="btn btn-success w-100 w-md-auto">Thêm người thuê</button>
@@ -197,20 +197,26 @@
             </form>
 
             <!-- Quản lý dữ liệu -->
-            <div class="card mb-3">
-                <div class="card-header">Quản lý dữ liệu</div>
-                <div class="card-body d-flex flex-column flex-md-row gap-2">
-                    <form method="post" asp-page-handler="ResetRoomData" class="w-100 w-md-auto">
-                        <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
-                        <button type="submit" class="btn btn-warning w-100" onclick="return confirm('Xóa tất cả người thuê và phí nhưng giữ số điện nước?')">
-                            Xóa dữ liệu nhưng giữ số điện nước
-                        </button>
-                    </form>
-
+            <div class="card mb-3 shadow-sm">
+                <div class="card-header bg-danger text-white fw-bold">
+                    Quản lý dữ liệu
+                </div>
+                <div class="card-body d-flex flex-column flex-md-row gap-3 justify-content-center align-items-center">
+                    <!-- Nút xóa dữ liệu -->
                     <form method="post" asp-page-handler="DeleteAllData" class="w-100 w-md-auto">
                         <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
                         <button type="submit" class="btn btn-danger w-100" onclick="return confirm('Xóa toàn bộ dữ liệu phòng?')">
-                            Xóa toàn bộ dữ liệu
+                            <i class="bi bi-trash-fill"></i> Xóa dữ liệu
+                        </button>
+                    </form>
+
+                    <!-- Nút tạo hóa đơn -->
+                    <form method="post" asp-page-handler="ExportInvoice" class="w-100 w-md-auto">
+                        <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
+                        <input type="hidden" name="Thang" value="@Model.Thang" />
+                        <input type="hidden" name="Nam" value="@Model.Nam" />
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-receipt"></i> Tạo hóa đơn
                         </button>
                     </form>
                 </div>

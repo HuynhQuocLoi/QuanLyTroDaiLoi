@@ -1,6 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QuanLyTroDaiLoi.Data;
 using QuanLyTroDaiLoi.Models;
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+
 
 var builder = WebApplication.CreateBuilder(args);
 
