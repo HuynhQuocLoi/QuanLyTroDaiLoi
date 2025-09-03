@@ -84,16 +84,27 @@
                 <input type="hidden" name="Thang" value="@Model.Thang" />
                 <input type="hidden" name="Nam" value="@Model.Nam" />
 
-                <div class="col-12 col-md-3"><input class="form-control" name="HoTen" placeholder="Họ tên" required /></div>
-                <div class="col-12 col-md-2"><input class="form-control" name="CCCD" placeholder="CCCD" required /></div>
-                <div class="col-12 col-md-2"><input class="form-control" name="SDT" placeholder="SĐT" required /></div>
-                <div class="col-12 col-md-3"><input class="form-control" name="DiaChi" placeholder="Địa chỉ" required /></div>
-                <div class="col-12 col-md-2"><input type="date" class="form-control" name="NgayVao" required /></div>
+                <div class="col-12 col-md-3">
+                    <input class="form-control" name="HoTen" placeholder="Họ tên" required />
+                </div>
+                <div class="col-12 col-md-2">
+                    <input class="form-control" name="CCCD" placeholder="CCCD" required />
+                </div>
+                <div class="col-12 col-md-2">
+                    <input class="form-control" name="SDT" placeholder="SĐT" required />
+                </div>
+                <div class="col-12 col-md-3">
+                    <input class="form-control" name="DiaChi" placeholder="Địa chỉ" required />
+                </div>
+                <div class="col-12 col-md-2">
+                    <input type="date" class="form-control" name="NgayVao" lang="vi" required />
+                </div>
 
                 <div class="col-12 mt-2">
                     <button type="submit" class="btn btn-success w-100 w-md-auto">Thêm người thuê</button>
                 </div>
             </form>
+
 
             <!-- Hóa đơn điện nước -->
             <form method="post" asp-page-handler="SaveWaterElectric" class="row g-2 mb-3">

@@ -1,8 +1,8 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using QuanLyTroDaiLoi.Data;
 using QuanLyTroDaiLoi.Models;
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,9 +14,7 @@ var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL")
                   ?? "postgresql://postgres:PRyQzqSjQqPAyIslcwLpsELOYPAMOcTH@hopper.proxy.rlwy.net:10473/railway";
 
 if (string.IsNullOrWhiteSpace(databaseUrl))
-{
-    throw new InvalidOperationException("DATABASE_URL chưa được cấu hình trong environment variables.");
-}
+    throw new InvalidOperationException("DATABASE_URL chưa được cấu hình.");
 
 var databaseUri = new Uri(databaseUrl);
 var userInfo = databaseUri.UserInfo.Split(':');
@@ -51,6 +49,7 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+// Middleware
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
@@ -58,7 +57,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles(); // Serve CSS/JS trong wwwroot
+app.UseStaticFiles(); // phục vụ CSS/JS trong wwwroot
 app.UseRouting();
 app.UseAuthorization();
 
