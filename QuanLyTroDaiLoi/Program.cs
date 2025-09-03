@@ -4,18 +4,18 @@ using QuanLyTroDaiLoi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// 🔹 Đăng ký Razor Pages
+// Razor Pages
 builder.Services.AddRazorPages();
 
-// 🔹 Lấy connection string từ environment variable DATABASE_URL của Railway
-var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL");
+// Lấy connection string từ Railway DATABASE_URL
+var databaseUrl = Environment.GetEnvironmentVariable("DATABASE_URL")
+                  ?? "postgresql://postgres:PRyQzqSjQqPAyIslcwLpsELOYPAMOcTH@hopper.proxy.rlwy.net:10473/railway";
 
 if (string.IsNullOrWhiteSpace(databaseUrl))
 {
     throw new InvalidOperationException("DATABASE_URL chưa được cấu hình trong environment variables.");
 }
 
-// 🔹 Parse DATABASE_URL (postgresql://username:password@host:port/dbname)
 var databaseUri = new Uri(databaseUrl);
 var userInfo = databaseUri.UserInfo.Split(':');
 
@@ -34,7 +34,7 @@ builder.Services.AddDbContext<TroDbContext>(options =>
 
 var app = builder.Build();
 
-// 🔹 Áp dụng migration tự động khi app start
+// Áp dụng migration tự động
 using (var scope = app.Services.CreateScope())
 {
     var db = scope.ServiceProvider.GetRequiredService<TroDbContext>();
@@ -56,10 +56,9 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStaticFiles();  // quan trọng, để serve CSS/JS từ wwwroot
+app.UseStaticFiles(); // Serve CSS/JS trong wwwroot
 app.UseRouting();
-app.UseAuthorization(); // nếu có authentication
+app.UseAuthorization();
 
 app.MapRazorPages();
 app.Run();
-

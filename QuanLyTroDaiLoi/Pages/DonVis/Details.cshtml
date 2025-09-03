@@ -123,7 +123,7 @@
                 </div>
             </form>
 
-            <!-- Tổng tiền -->
+            <!-- Tổng tiền & Phí khác -->
             <div class="card mb-3">
                 <div class="card-header">Tổng tiền</div>
                 <div class="card-body">
@@ -162,9 +162,9 @@
                         {
                             <tr>
                                 <td>@phi.TenPhi</td>
-                                <td>@phi.DonGia.ToString("C0", CultureInfo.GetCultureInfo("vi-VN"))</td>
+                                <td>@phi.DonGia.ToString("C0", vnFormat)</td>
                                 <td>@phi.SoLuong</td>
-                                <td>@phi.ThanhTien.ToString("C0", CultureInfo.GetCultureInfo("vi-VN"))</td>
+                                <td>@phi.ThanhTien.ToString("C0", vnFormat)</td>
                                 <td>
                                     <form method="post" asp-page-handler="DeletePhiKhac">
                                         <input type="hidden" name="id" value="@Model.DonVi.DonViId" />

@@ -18,12 +18,12 @@
         <div class="row g-3">
             <div class="col-12 col-md-6">
                 <label asp-for="CauHinh.GiaThuePhong" class="form-label"></label>
-                <input asp-for="CauHinh.GiaThuePhong" class="form-control w-100" />
+                <input asp-for="CauHinh.GiaThuePhong" class="form-control" />
                 <span asp-validation-for="CauHinh.GiaThuePhong" class="text-danger"></span>
             </div>
             <div class="col-12 col-md-6">
                 <label asp-for="CauHinh.GiaThueNha" class="form-label"></label>
-                <input asp-for="CauHinh.GiaThueNha" class="form-control w-100" />
+                <input asp-for="CauHinh.GiaThueNha" class="form-control" />
                 <span asp-validation-for="CauHinh.GiaThueNha" class="text-danger"></span>
             </div>
         </div>
@@ -41,5 +41,4 @@
     @section Scripts {
         <partial name="_ValidationScriptsPartial" />
     }
-
 </div>
