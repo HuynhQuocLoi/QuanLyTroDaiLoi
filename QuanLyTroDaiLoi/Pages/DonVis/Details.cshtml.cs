@@ -434,7 +434,7 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
                                 c.RelativeColumn(3);  // Hạng mục
                                 c.RelativeColumn(3);  // Chỉ số
                                 c.RelativeColumn(3);  // Đơn giá
-                                c.RelativeColumn(6);  // Thành tiền (rộng nhất)
+                                c.RelativeColumn(6);  // Thành tiền
                             });
 
                             // Header
@@ -443,25 +443,19 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
                                 h.Cell().Border(1).Padding(4).Background(Colors.Grey.Lighten2).Text("Hạng mục").SemiBold();
                                 h.Cell().Border(1).Padding(4).Background(Colors.Grey.Lighten2).AlignCenter().Text("Chỉ số").SemiBold();
                                 h.Cell().Border(1).Padding(4).Background(Colors.Grey.Lighten2).AlignCenter().Text("Đơn giá").SemiBold();
-                                h.Cell().Border(1).Padding(4)
-    .Background(Colors.Grey.Lighten2)
-    .AlignCenter()   // thay vì AlignRight
-    .Text("Thành tiền").SemiBold();
-
+                                h.Cell().Border(1).Padding(4).Background(Colors.Grey.Lighten2).AlignCenter().Text("Thành tiền").SemiBold();
                             });
 
-                            // Hàm tiện ích để thêm row
                             void Row(string hangMuc, string chiSo, string donGia, string thanhTien)
                             {
                                 table.Cell().Border(1).Padding(4).Text(hangMuc);
                                 table.Cell().Border(1).Padding(4).AlignCenter().Text(chiSo);
                                 table.Cell().Border(1).Padding(4).AlignCenter().Text(donGia);
-                                table.Cell().Border(1).Padding(4).AlignRight()
-                                    .Element(x => x.Shrink()) // ép số nằm gọn
-                                    .Text(thanhTien);
+                                table.Cell().Border(1).Padding(4).AlignCenter() // ❌ Không AlignRight nữa
+                                    .Text(thanhTien); // Bắt đầu từ trái
                             }
 
-
+                            // Dữ liệu
                             Row("Tiền phòng", "-", "-", $"{hd.TienPhong:N0}");
                             Row("Điện", $"{hd.DienCu} → {hd.DienMoi}", $"{hd.DonGiaDien:N0}", $"{tienDien:N0}");
                             Row("Nước", $"{hd.NuocCu} → {hd.NuocMoi}", $"{hd.DonGiaNuoc:N0}", $"{tienNuoc:N0}");
@@ -473,15 +467,15 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
                                     Row(phi.TenPhi, "-", $"{phi.DonGia:N0}", $"{phi.ThanhTien:N0}");
                                 }
                             }
+
+                            // Footer tổng cộng
+                            table.Footer(f =>
+                            {
+                                f.Cell().ColumnSpan(3).Border(1).Padding(4).Text("TỔNG CỘNG").AlignRight().Bold();
+                                f.Cell().Border(1).Padding(4).Text($"{tongTien:N0} ₫").AlignRight().Bold().FontColor(Colors.Red.Medium);
+                            });
                         });
 
-
-                        // Tổng cộng
-                        col.Item()
-                            .PaddingTop(10)
-                            .AlignRight()
-                            .Text($"TỔNG CỘNG: {tongTien:N0} ₫")
-                            .Bold().FontSize(14).FontColor(Colors.Red.Medium);
 
                         // Footer
                         col.Item().PaddingTop(15).Column(c =>
