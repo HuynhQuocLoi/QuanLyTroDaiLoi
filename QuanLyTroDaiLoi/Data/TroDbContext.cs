@@ -28,12 +28,13 @@ namespace QuanLyTroDaiLoi.Data
             });
 
             // Seed 20 phòng mặc định
-            for (int i = 1; i <= 20; i++)
+            var danhSachPhong = new int[] { 1, 2, 3, 4, 6, 7, 8, 9, 10, 12, 16, 17, 18, 19, 20, 22, 24, 25, 26, 27 };
+            foreach (var phong in danhSachPhong)
             {
                 modelBuilder.Entity<DonVi>().HasData(new DonVi
                 {
-                    DonViId = i,
-                    TenDonVi = $"Phòng {i}",
+                    DonViId = phong,
+                    TenDonVi = $"Phòng {phong}",
                     GiaThue = 1500000m,
                     LoaiDonVi = "Phong",
                     SoDienCu = 0,
@@ -42,14 +43,14 @@ namespace QuanLyTroDaiLoi.Data
                 });
             }
 
-            // Seed 10 nhà mặc định
-            for (int i = 1; i <= 10; i++)
+            var danhSachNha = new int[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 15, 16 };
+            foreach (var nha in danhSachNha)
             {
                 modelBuilder.Entity<DonVi>().HasData(new DonVi
                 {
-                    DonViId = 100 + i, // tránh trùng ID với phòng
-                    TenDonVi = $"Nhà {i}",
-                    GiaThue = 5000000m, // giá thuê mặc định cho nhà
+                    DonViId = 100 + nha, // tránh trùng ID với phòng
+                    TenDonVi = $"Nhà {nha}",
+                    GiaThue = 5000000m,
                     LoaiDonVi = "Nha",
                     SoDienCu = 0,
                     SoNuocCu = 0,
