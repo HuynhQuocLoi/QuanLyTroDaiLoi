@@ -1,0 +1,159 @@
+﻿@page
+@model QuanLyTroDaiLoi.Pages.DanhSachDongTienModel
+@{
+    ViewData["Title"] = "Danh sách đóng tiền";
+}
+
+<div class="container mt-4">
+    <h2 class="fw-bold mb-4">📋 Danh sách đóng tiền</h2>
+
+    <!-- Bộ lọc tháng/năm -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-6 col-md-2">
+                    <label class="form-label fw-bold">Tháng</label>
+                    <select name="thang" class="form-select">
+                        @for (int i = 1; i <= 12; i++)
+                        {
+                            <option value="@i" selected="@(i == Model.Thang)">@i</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-6 col-md-2">
+                    <label class="form-label fw-bold">Năm</label>
+                    <select name="nam" class="form-select">
+                        @for (int i = 2025; i <= DateTime.Now.Year + 2; i++)
+                        {
+                            <option value="@i" selected="@(i == Model.Nam)">@i</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-12 col-md-2">
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-search"></i> Xem
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- ================== Danh sách Phòng ================== -->
+    <h3 class="mt-4">🛏️ Phòng</h3>
+
+    <!-- Hiển thị dạng bảng trên PC -->
+    <div class="d-none d-md-block table-responsive">
+        <table class="table table-striped table-hover text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th style="width:70%">Tên phòng</th>
+                    <th style="width:30%">Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var phong in Model.DonVis.Where(d => d.LoaiDonVi == "Phong"))
+                {
+                    var hd = Model.HoaDons.FirstOrDefault(h => h.DonViId == phong.DonViId);
+                    <tr>
+                        <td class="fw-bold">@phong.TenDonVi</td>
+                        <td>
+                            @if (hd != null && hd.DaDongTien)
+                            {
+                                <span class="badge bg-success px-3 py-2">Đã đóng</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger px-3 py-2">Chưa đóng</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Hiển thị dạng card list trên Mobile -->
+    <div class="d-md-none">
+        <div class="row row-cols-1 g-3">
+            @foreach (var phong in Model.DonVis.Where(d => d.LoaiDonVi == "Phong"))
+            {
+                var hd = Model.HoaDons.FirstOrDefault(h => h.DonViId == phong.DonViId);
+                <div class="col">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">@phong.TenDonVi</span>
+                            @if (hd != null && hd.DaDongTien)
+                            {
+                                <span class="badge bg-success">Đã đóng</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Chưa đóng</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <!-- ================== Danh sách Nhà ================== -->
+    <h3 class="mt-4">🏠 Nhà</h3>
+
+    <!-- Bảng trên PC -->
+    <div class="d-none d-md-block table-responsive">
+        <table class="table table-striped table-hover text-center align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th style="width:70%">Tên nhà</th>
+                    <th style="width:30%">Trạng thái</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Nhà -->
+                @foreach (var nha in Model.DonVis.Where(d => d.LoaiDonVi == "Nha"))
+                {
+                    var hd = Model.HoaDons.FirstOrDefault(h => h.DonViId == nha.DonViId);
+                    <tr>
+                        <td class="fw-bold">@nha.TenDonVi</td>
+                        <td>
+                            @if (hd != null && hd.DaDongTien)
+                            {
+                                <span class="badge bg-success px-3 py-2">Đã đóng</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger px-3 py-2">Chưa đóng</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Card list trên Mobile -->
+    <div class="d-md-none">
+        <div class="row row-cols-1 g-3">
+            @foreach (var nha in Model.DonVis.Where(d => d.LoaiDonVi == "Nha"))
+            {
+                var hd = Model.HoaDons.FirstOrDefault(h => h.DonViId == nha.DonViId);
+                <div class="col">
+                    <div class="card shadow-sm border-0">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <span class="fw-bold">@nha.TenDonVi</span>
+                            @if (hd != null && hd.DaDongTien)
+                            {
+                                <span class="badge bg-success">Đã đóng</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-danger">Chưa đóng</span>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>

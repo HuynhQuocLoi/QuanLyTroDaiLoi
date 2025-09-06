@@ -35,6 +35,8 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
         // ------------------------ GET ------------------------
         public async Task<IActionResult> OnGetAsync(int id, int thang = 0, int nam = 0)
         {
+            int startYear = 2025;
+            int endYear = DateTime.Now.Year + 2;
             DonVi = await _context.DonVis
                 .Include(d => d.NguoiThues)
                 .FirstOrDefaultAsync(d => d.DonViId == id);
@@ -49,12 +51,15 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
                 Selected = x == thang
             }), "Value", "Text");
 
-            NamList = new SelectList(Enumerable.Range(2020, 10).Select(x => new SelectListItem
-            {
-                Value = x.ToString(),
-                Text = x.ToString(),
-                Selected = x == nam
-            }), "Value", "Text");
+            NamList = new SelectList(
+    Enumerable.Range(startYear, endYear - startYear + 1).Select(x => new SelectListItem
+    {
+        Value = x.ToString(),
+        Text = x.ToString(),
+        Selected = (nam == 0 ? x == DateTime.Now.Year : x == nam)
+    }),
+    "Value", "Text"
+);
 
             Thang = thang;
             Nam = nam;
@@ -409,6 +414,8 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
 
             QuestPDF.Settings.License = LicenseType.Community;
 
+            QuestPDF.Settings.License = LicenseType.Community;
+
             var document = Document.Create(container =>
             {
                 container.Page(page =>
@@ -426,58 +433,67 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
                         col.Item().Text($"{hd.DonVi.TenDonVi} - Tháng {Thang}/{Nam}")
                             .FontSize(12).AlignCenter();
 
-                        // Bảng chi tiết
+                        // Bảng chi tiết (có thêm cột Tiêu thụ)
                         col.Item().Table(table =>
                         {
                             table.ColumnsDefinition(c =>
                             {
                                 c.RelativeColumn(3);  // Hạng mục
                                 c.RelativeColumn(3);  // Chỉ số
+                                c.RelativeColumn(2);  // Tiêu thụ
                                 c.RelativeColumn(3);  // Đơn giá
-                                c.RelativeColumn(6);  // Thành tiền
+                                c.RelativeColumn(4);  // Thành tiền
                             });
 
                             // Header
-                            table.Header(h =>
+                            table.Header(header =>
                             {
-                                h.Cell().Border(1).Padding(4).Background(Colors.Grey.Lighten2).Text("Hạng mục").SemiBold();
-                                h.Cell().Border(1).Padding(4).Background(Colors.Grey.Lighten2).AlignCenter().Text("Chỉ số").SemiBold();
-                                h.Cell().Border(1).Padding(4).Background(Colors.Grey.Lighten2).AlignCenter().Text("Đơn giá").SemiBold();
-                                h.Cell().Border(1).Padding(4).Background(Colors.Grey.Lighten2).AlignCenter().Text("Thành tiền").SemiBold();
+                                header.Cell().Border(1).PaddingVertical(6).PaddingHorizontal(4)
+                                    .Background(Colors.Grey.Lighten2).AlignCenter().Text("Hạng mục").SemiBold();
+                                header.Cell().Border(1).PaddingVertical(6).PaddingHorizontal(4)
+                                    .Background(Colors.Grey.Lighten2).AlignCenter().Text("Chỉ số").SemiBold();
+                                header.Cell().Border(1).PaddingVertical(6).PaddingHorizontal(4)
+                                    .Background(Colors.Grey.Lighten2).AlignCenter().Text("Tiêu thụ").SemiBold();
+                                header.Cell().Border(1).PaddingVertical(6).PaddingHorizontal(4)
+                                    .Background(Colors.Grey.Lighten2).AlignCenter().Text("Đơn giá").SemiBold();
+                                header.Cell().Border(1).PaddingVertical(6).PaddingHorizontal(4)
+                                    .Background(Colors.Grey.Lighten2).AlignCenter().Text("Thành tiền").SemiBold();
                             });
 
-                            void Row(string hangMuc, string chiSo, string donGia, string thanhTien)
+                            // Row helper (lưu ý: .Text(...).SemiBold() là hợp lệ)
+                            // Row helper: tất cả AlignLeft
+                            void Row(string hangMuc, string chiSo, string tieuThu, string donGia, string thanhTien)
                             {
-                                table.Cell().Border(1).Padding(4).Text(hangMuc);
-                                table.Cell().Border(1).Padding(4).AlignCenter().Text(chiSo);
-                                table.Cell().Border(1).Padding(4).AlignCenter().Text(donGia);
-                                table.Cell().Border(1).Padding(4).AlignCenter() // ❌ Không AlignRight nữa
-                                    .Text(thanhTien); // Bắt đầu từ trái
+                                table.Cell().Border(1).Padding(6).AlignLeft().Text(hangMuc);
+                                table.Cell().Border(1).Padding(6).AlignLeft().Text(chiSo);
+                                table.Cell().Border(1).Padding(6).AlignLeft().Text(tieuThu);
+                                table.Cell().Border(1).Padding(6).AlignLeft().Text(donGia);
+                                table.Cell().Border(1).Padding(6).AlignLeft().Text(thanhTien);
                             }
 
                             // Dữ liệu
-                            Row("Tiền phòng", "-", "-", $"{hd.TienPhong:N0}");
-                            Row("Điện", $"{hd.DienCu} → {hd.DienMoi}", $"{hd.DonGiaDien:N0}", $"{tienDien:N0}");
-                            Row("Nước", $"{hd.NuocCu} → {hd.NuocMoi}", $"{hd.DonGiaNuoc:N0}", $"{tienNuoc:N0}");
+                            Row("Tiền phòng", "-", "-", "-", $"{hd.TienPhong:N0}");
+                            Row("Điện", $"{hd.DienCu} → {hd.DienMoi}", $"{hd.DienMoi - hd.DienCu}", $"{hd.DonGiaDien:N0}", $"{tienDien:N0}");
+                            Row("Nước", $"{hd.NuocCu} → {hd.NuocMoi}", $"{hd.NuocMoi - hd.NuocCu}", $"{hd.DonGiaNuoc:N0}", $"{tienNuoc:N0}");
 
-                            if (hd.PhiKhacs != null)
+                            if (hd.PhiKhacs != null && hd.PhiKhacs.Any())
                             {
                                 foreach (var phi in hd.PhiKhacs)
                                 {
-                                    Row(phi.TenPhi, "-", $"{phi.DonGia:N0}", $"{phi.ThanhTien:N0}");
+                                    Row(phi.TenPhi, "-", "-", $"{phi.DonGia:N0}", $"{phi.ThanhTien:N0}");
                                 }
                             }
 
-                            // Footer tổng cộng
-                            table.Footer(f =>
-                            {
-                                f.Cell().ColumnSpan(3).Border(1).Padding(4).Text("TỔNG CỘNG").AlignRight().Bold();
-                                f.Cell().Border(1).Padding(4).Text($"{tongTien:N0} ₫").AlignRight().Bold().FontColor(Colors.Red.Medium);
-                            });
+                            // Tổng cộng
+                            table.Cell().ColumnSpan(4).Border(1).Padding(8).AlignLeft()
+                                .Text("TỔNG CỘNG").SemiBold();
+
+                            table.Cell().Border(1).Padding(8).AlignLeft()
+                                .Text($"{tongTien:N0} ₫").SemiBold().FontColor(Colors.Red.Medium);
+
                         });
 
-
-                        // Footer
+                        // Footer text dưới bảng
                         col.Item().PaddingTop(15).Column(c =>
                         {
                             c.Item().Text("Người nhận: Huỳnh Công Lý").AlignCenter();
@@ -488,6 +504,7 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
                 });
             });
 
+
             // Xuất ra ảnh PNG
             var images = document.GenerateImages();
             var firstImageBytes = images.First();
@@ -495,6 +512,17 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
 
             return File(imgStream, "image/png", $"HoaDon_{hd.DonVi.TenDonVi}_{Thang}_{Nam}.png");
         }
+        public async Task<IActionResult> OnPostTogglePaidAsync(int hoaDonId)
+        {
+            var hoaDon = await _context.HoaDons.FindAsync(hoaDonId);
+            if (hoaDon == null) return NotFound();
+
+            hoaDon.DaDongTien = !hoaDon.DaDongTien;
+            await _context.SaveChangesAsync();
+
+            return RedirectToPage(new { id = hoaDon.DonViId, thang = hoaDon.Thang, nam = hoaDon.Nam });
+        }
+
 
 
     }

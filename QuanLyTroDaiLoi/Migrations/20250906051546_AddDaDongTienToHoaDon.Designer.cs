@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using QuanLyTroDaiLoi.Data;
@@ -11,9 +12,10 @@ using QuanLyTroDaiLoi.Data;
 namespace QuanLyTroDaiLoi.Migrations
 {
     [DbContext(typeof(TroDbContext))]
-    partial class TroDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250906051546_AddDaDongTienToHoaDon")]
+    partial class AddDaDongTienToHoaDon
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

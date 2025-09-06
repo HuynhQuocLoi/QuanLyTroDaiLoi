@@ -36,7 +36,7 @@ namespace QuanLyTroDaiLoi.Models
         public bool IsClosed { get; set; } = false;
         [Column(TypeName = "decimal(18,2)")]
         public decimal TienPhong { get; set; }
-
+        public bool DaDongTien { get; set; } = false;
 
     }
 }

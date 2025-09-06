@@ -212,26 +212,36 @@
                 <div class="card-header bg-danger text-white fw-bold">
                     Quản lý dữ liệu
                 </div>
-                <div class="card-body d-flex flex-column flex-md-row gap-3 justify-content-center align-items-center">
-                    <!-- Nút xóa dữ liệu -->
-                    <form method="post" asp-page-handler="DeleteAllData" class="w-100 w-md-auto">
-                        <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
-                        <button type="submit" class="btn btn-danger w-100"
-                                onclick="return confirm('Bạn có chắc muốn xóa toàn bộ dữ liệu của phòng này không?')">
-                            <i class="bi bi-trash-fill"></i> Xóa dữ liệu
-                        </button>
-                    </form>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap gap-2 justify-content-center">
+                        <!-- Nút xóa dữ liệu -->
+                        <form method="post" asp-page-handler="DeleteAllData">
+                            <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
+                            <button type="submit" class="btn btn-danger"
+                                    onclick="return confirm('Bạn có chắc muốn xóa toàn bộ dữ liệu của phòng này không?')">
+                                <i class="bi bi-trash-fill"></i> Xóa dữ liệu
+                            </button>
+                        </form>
 
+                        <!-- Nút tạo hóa đơn -->
+                        <form method="post" asp-page-handler="ExportInvoice">
+                            <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
+                            <input type="hidden" name="Thang" value="@Model.Thang" />
+                            <input type="hidden" name="Nam" value="@Model.Nam" />
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-receipt"></i> Tạo hóa đơn
+                            </button>
+                        </form>
 
-                    <!-- Nút tạo hóa đơn -->
-                    <form method="post" asp-page-handler="ExportInvoice" class="mt-3">
-                        <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
-                        <input type="hidden" name="Thang" value="@Model.Thang" />
-                        <input type="hidden" name="Nam" value="@Model.Nam" />
-                        <button type="submit" class="btn btn-primary">
-                            <i class="bi bi-receipt"></i> Tạo hóa đơn
-                        </button>
-                    </form>
+                        <!-- Nút toggle đã đóng tiền -->
+                        <form method="post" asp-page-handler="TogglePaid">
+                            <input type="hidden" name="hoaDonId" value="@Model.CurrentMonth?.HoaDonId" />
+                            <button type="submit"
+                                    class="btn @(Model.CurrentMonth?.DaDongTien == true ? "btn-success" : "btn-warning")">
+                                @(Model.CurrentMonth?.DaDongTien == true ? "Đã đóng tiền" : "Chưa đóng tiền")
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
         }
