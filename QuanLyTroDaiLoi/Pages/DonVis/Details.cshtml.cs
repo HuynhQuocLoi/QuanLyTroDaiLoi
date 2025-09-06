@@ -422,9 +422,14 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
                 {
                     page.Size(PageSizes.A5);
                     page.Margin(20);
+                    var tieuDe = hd.DonVi.LoaiDonVi == "Phong"
+    ? "Phiếu thanh toán phòng trọ"
+    : "Phiếu thanh toán nhà trọ";
 
-                    page.Header().Text("HÓA ĐƠN THANH TOÁN THUÊ TRỌ")
-                        .SemiBold().FontSize(18).FontColor(Colors.Blue.Medium).AlignCenter();
+
+                    page.Header().Text(tieuDe)
+    .SemiBold().FontSize(18).FontColor(Colors.Blue.Medium).AlignCenter();
+
 
                     page.Content().Column(col =>
                     {
@@ -496,6 +501,8 @@ namespace QuanLyTroDaiLoi.Pages.DonVis
                         // Footer text dưới bảng
                         col.Item().PaddingTop(15).Column(c =>
                         {
+                            c.Item().Text("Vui lòng kiểm tra đồng hồ điện,nước trước khi thanh toán!").AlignCenter().Bold().FontColor(Colors.Red.Medium);
+                            c.Item().Text("-Khi chuyển tiền nhớ ghi số phòng-").AlignCenter().Bold().FontColor(Colors.Red.Medium);
                             c.Item().Text("Người nhận: Huỳnh Công Lý").AlignCenter();
                             c.Item().Text($"STK: {soTaiKhoan} (Sacombank)").AlignCenter();
                             c.Item().Text("Xin cảm ơn quý khách!").Italic().FontSize(11).AlignCenter();

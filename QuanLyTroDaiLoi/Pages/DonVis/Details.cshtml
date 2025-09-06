@@ -84,27 +84,16 @@
                 <input type="hidden" name="Thang" value="@Model.Thang" />
                 <input type="hidden" name="Nam" value="@Model.Nam" />
 
-                <div class="col-12 col-md-3">
-                    <input class="form-control" name="HoTen" placeholder="Họ tên" required />
-                </div>
-                <div class="col-12 col-md-2">
-                    <input class="form-control" name="CCCD" placeholder="CCCD" required />
-                </div>
-                <div class="col-12 col-md-2">
-                    <input class="form-control" name="SDT" placeholder="SĐT" required />
-                </div>
-                <div class="col-12 col-md-3">
-                    <input class="form-control" name="DiaChi" placeholder="Địa chỉ" required />
-                </div>
-                <div class="col-12 col-md-2">
-                    <input type="date" class="form-control" name="NgayVao" lang="vi" required />
-                </div>
+                <div class="col-12 col-md-3"><input class="form-control" name="HoTen" placeholder="Họ tên" required /></div>
+                <div class="col-12 col-md-2"><input class="form-control" name="CCCD" placeholder="CCCD" required /></div>
+                <div class="col-12 col-md-2"><input class="form-control" name="SDT" placeholder="SĐT" required /></div>
+                <div class="col-12 col-md-3"><input class="form-control" name="DiaChi" placeholder="Địa chỉ" required /></div>
+                <div class="col-12 col-md-2"><input type="date" class="form-control" name="NgayVao" lang="vi" required /></div>
 
                 <div class="col-12 mt-2">
                     <button type="submit" class="btn btn-success w-100 w-md-auto">Thêm người thuê</button>
                 </div>
             </form>
-
 
             <!-- Hóa đơn điện nước -->
             <form method="post" asp-page-handler="SaveWaterElectric" class="row g-2 mb-3">
@@ -112,22 +101,10 @@
                 <input type="hidden" name="Thang" value="@Model.Thang" />
                 <input type="hidden" name="Nam" value="@Model.Nam" />
 
-                <div class="col-6 col-md-3">
-                    <label>Điện cũ</label>
-                    <input type="number" class="form-control" name="DienCu" value="@Model.CurrentMonth.DienCu" required />
-                </div>
-                <div class="col-6 col-md-3">
-                    <label>Điện mới</label>
-                    <input type="number" class="form-control" name="DienMoi" value="@Model.CurrentMonth.DienMoi" required />
-                </div>
-                <div class="col-6 col-md-3">
-                    <label>Nước cũ</label>
-                    <input type="number" class="form-control" name="NuocCu" value="@Model.CurrentMonth.NuocCu" required />
-                </div>
-                <div class="col-6 col-md-3">
-                    <label>Nước mới</label>
-                    <input type="number" class="form-control" name="NuocMoi" value="@Model.CurrentMonth.NuocMoi" required />
-                </div>
+                <div class="col-6 col-md-3"><label>Điện cũ</label><input type="number" class="form-control" name="DienCu" value="@Model.CurrentMonth.DienCu" required /></div>
+                <div class="col-6 col-md-3"><label>Điện mới</label><input type="number" class="form-control" name="DienMoi" value="@Model.CurrentMonth.DienMoi" required /></div>
+                <div class="col-6 col-md-3"><label>Nước cũ</label><input type="number" class="form-control" name="NuocCu" value="@Model.CurrentMonth.NuocCu" required /></div>
+                <div class="col-6 col-md-3"><label>Nước mới</label><input type="number" class="form-control" name="NuocMoi" value="@Model.CurrentMonth.NuocMoi" required /></div>
 
                 <div class="col-12 mt-2">
                     <button type="submit" class="btn btn-info w-100 w-md-auto">Lưu điện nước</button>
@@ -198,9 +175,7 @@
                 <input type="hidden" name="Nam" value="@Model.Nam" />
 
                 <div class="col-12 col-md-4"><input class="form-control" name="TenPhi" placeholder="Tên phí" required /></div>
-                <div class="col-12 col-md-3">
-                    <input type="text" class="form-control" name="DonGiaInput" placeholder="Đơn giá" required oninput="formatCurrency(this)" />
-                </div>
+                <div class="col-12 col-md-3"><input type="text" class="form-control" name="DonGiaInput" placeholder="Đơn giá" required oninput="formatCurrency(this)" /></div>
                 <div class="col-12 col-md-2"><input type="number" class="form-control" name="SoLuong" placeholder="SL" required /></div>
                 <div class="col-12 col-md-3">
                     <button type="submit" class="btn btn-success w-100 w-md-auto">Thêm phí khác</button>
@@ -209,16 +184,13 @@
 
             <!-- Quản lý dữ liệu -->
             <div class="card mb-3 shadow-sm">
-                <div class="card-header bg-danger text-white fw-bold">
-                    Quản lý dữ liệu
-                </div>
+                <div class="card-header bg-danger text-white fw-bold"> Quản lý dữ liệu </div>
                 <div class="card-body">
                     <div class="d-flex flex-wrap gap-2 justify-content-center">
                         <!-- Nút xóa dữ liệu -->
                         <form method="post" asp-page-handler="DeleteAllData">
                             <input type="hidden" name="id" value="@Model.DonVi.DonViId" />
-                            <button type="submit" class="btn btn-danger"
-                                    onclick="return confirm('Bạn có chắc muốn xóa toàn bộ dữ liệu của phòng này không?')">
+                            <button type="submit" class="btn btn-danger" onclick="return confirm('Bạn có chắc muốn xóa toàn bộ dữ liệu của phòng này không?')">
                                 <i class="bi bi-trash-fill"></i> Xóa dữ liệu
                             </button>
                         </form>
@@ -236,8 +208,7 @@
                         <!-- Nút toggle đã đóng tiền -->
                         <form method="post" asp-page-handler="TogglePaid">
                             <input type="hidden" name="hoaDonId" value="@Model.CurrentMonth?.HoaDonId" />
-                            <button type="submit"
-                                    class="btn @(Model.CurrentMonth?.DaDongTien == true ? "btn-success" : "btn-warning")">
+                            <button type="submit" class="btn @(Model.CurrentMonth?.DaDongTien == true ? "btn-success" : "btn-warning")">
                                 @(Model.CurrentMonth?.DaDongTien == true ? "Đã đóng tiền" : "Chưa đóng tiền")
                             </button>
                         </form>
@@ -253,4 +224,16 @@
         let value = input.value.replace(/\D/g, '');
         input.value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
     }
+
+    // Lưu và khôi phục vị trí scroll
+    window.addEventListener("beforeunload", function () {
+        sessionStorage.setItem("scrollPosition", window.scrollY);
+    });
+    window.addEventListener("load", function () {
+        const pos = sessionStorage.getItem("scrollPosition");
+        if (pos !== null) {
+            window.scrollTo(0, parseInt(pos));
+            sessionStorage.removeItem("scrollPosition");
+        }
+    });
 </script>
